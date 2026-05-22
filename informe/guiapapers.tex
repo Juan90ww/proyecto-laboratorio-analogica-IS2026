@@ -1,0 +1,335 @@
+\documentclass[journal]{IEEEtran}
+%
+\usepackage{instructivo}  % Commands for multiple choice
+\usepackage{float}
+\graphicspath{{./}{./fig/}}
+
+\usepackage[natbib=true,style=trad-unsrt,backend=biber]{biblatex}
+
+\addbibresource{literatura.bib}
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\begin{document}
+%
+% paper title
+% Titles are generally capitalized except for words such as a, an, and, as,
+% at, but, by, for, in, nor, of, on, or, the, to and up, which are usually
+% not capitalized unless they are the first or last word of the title.
+% Linebreaks \\ can be used within to get better formatting as desired.
+% Do not put math or special symbols in the title.
+\title{Proyecto laboratorio de electronica analogica}
+
+
+\author{~ Sebastián Calvo Fong ~,~\IEEEmembership{Estudiante,~ITCR}
+        y ~ Juan Esteban Obando Pérez ~,~\IEEEmembership{Estudiante,~ITCR,}
+        y ~ Dante Muñoz Vidal ~,~\IEEEmembership{Estudiante,~ITCR,}
+        y ~ Yashin Alexei Arroyo Cascante ~,~\IEEEmembership{Estudiante,~ITCR,}
+}
+
+
+% The paper headers
+\markboth{EL3215 Laboratorio de Electrónica Analógica, IS2026}%
+{EL3215 Laboratorio de Electrónica Analógica}
+
+
+% make the title area
+\maketitle
+
+
+\begin{abstract}
+El presente proyecto consiste en el diseño e implementación de un sistema de semáforo vehicular y peatonal, sin uso de dispositivos programables, basado exclusivamente en circuitos digitales discretos (temporizadores, compuertas lógicas, contadores y flip-flops). El sistema incluye fuente de alimentación lineal desde 120 VAC, secuenciamiento de luces vehiculares (rojo, amarillo, verde), solicitud peatonal con conteo regresivo de 20 segundos, display numérico de tiempo restante, y señalización auditiva con cambio de frecuencia en los últimos 5 segundos. Se presentan los módulos de fuente de alimentación, contador/display y máquina de estados, incluyendo criterios de selección de componentes y consideraciones de diseño.
+\end{abstract}
+
+% Se sugiere no más de cuatro palabras o frases cortas en orden alfabético, separadas por comas, que representen su reporte
+\begin{IEEEkeywords}
+Lógica digital, máquina de estados, contador síncrono, temporizador digital, TTL, fuente regulada, display de siete segmentos, FSM, electrónica digital, control secuencial.
+\end{IEEEkeywords}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introducción}
+
+\IEEEPARstart{E}{n} electrónica, los sistemas digitales secuenciales constituyen una parte fundamental de múltiples aplicaciones modernas debido a su capacidad para controlar eventos de manera ordenada y automática. Mediante el uso de compuertas lógicas, flip-flops, contadores y máquinas de estados, es posible desarrollar sistemas capaces de ejecutar secuencias específicas dependiendo de señales de entrada y condiciones temporales. \\
+
+El presente proyecto consiste en el desarrollo de un sistema digital modular compuesto por distintas etapas funcionales interconectadas. Entre estas se encuentran el módulo de alimentación regulada, encargado de suministrar una tensión estable al sistema; un módulo de temporización y conteo implementado con contadores síncronos y decodificadores; y un módulo de control basado en una máquina de estados finitos, responsable de coordinar la operación general del sistema.\\
+
+Cada módulo fue diseñado considerando criterios de estabilidad, confiabilidad y compatibilidad entre dispositivos TTL. Asimismo, se evaluaron aspectos relacionados con el consumo de corriente, niveles lógicos, sincronización y visualización de estados mediante indicadores luminosos y displays de siete segmentos. El diseño y validación de los circuitos se realizó mediante herramientas de simulación electrónica, permitiendo analizar el comportamiento dinámico del sistema antes de su implementación física..
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Propuesta de diseño}
+
+La propuesta de diseño se basa en una arquitectura modular, donde cada bloque cumple una función específica dentro del sistema general. Esta división permite simplificar el análisis, facilitar la depuración y mejorar la escalabilidad del proyecto. Cada módulo fue diseñado de forma independiente y posteriormente integrado para garantizar un funcionamiento coordinado y estable, el sistema se divide en cinco módulos funcionales: \\
+
+-Fuente de alimentación lineal: Transformador 120 VAC / 12 VAC, puente rectificador con diodos 1N5404, filtrado y regulador LM7805 para obtener +5 VDC.\\
+
+-Base de tiempo: Oscilador astable con 555 a 1 Hz para temporización de segundos.\\
+
+-Máquina de estados (FSM): Implementada con flip-flops 74LS74 y compuertas 74LS32, controla los estados: Verde vehicular, Amarillo vehicular, Rojo vehicular + Peatonal habilitado, y últimos 5 segundos de peatonal.\\
+
+-Contadores y display: Contadores 74LS192 en cascada configurados como conteo regresivo (30 s, 20 s, 5 s) con decodificadores 74LS147 a display de 7 segmentos. \\
+
+-Generador de audio y amplificador: Dos temporizadores 555 (frecuencia normal y alta) conmutados por la FSM, amplificador transistorizado clase A. \\
+
+La propuesta cumple con todas las especificaciones: botón peatonal, cambio de frecuencia de audio en últimos 5 s, display numérico y uso exclusivo de lógica discreta. \\
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\section{Sistema de alimentación regulada} 
+
+El módulo de alimentación tiene como objetivo convertir la tensión de la red eléctrica de corriente alterna en una tensión continua regulada de 5 V necesaria para alimentar los circuitos digitales TTL del sistema. El circuito implementa las etapas clásicas de transformación, rectificación, filtrado y regulación de voltaje.
+
+El diseño utiliza un transformador reductor conectado a un puente rectificador de onda completa compuesto por diodos 1N5404. Posteriormente, se emplean capacitores de filtrado para reducir el rizado de la señal rectificada y finalmente un regulador LM7805 proporciona una salida estable de 5 V.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[c]{0.4\textwidth}
+	\centering
+	\includegraphics[width=2.5in]{fig/alimentacion.PNG}
+	\label{fig:directa}	
+\end{subfigure}
+\hfill
+\caption{Simulacion de circuito; Fuente de alimentacion.}
+\label{fig:Amplificador B1}
+\end{figure}
+
+\subsection{Consideraciones de diseño}
+
+Aislamiento galvánico: Se utiliza transformador de 120 VAC / 12 VAC (o 9 VAC) para seguridad.\\
+
+Rectificación: Puente completo con diodos 1N5404 (3 A, 400 V), suficientes para corriente máxima estimada (<1 A).
+
+Filtrado: Dos capacitores de 1000 µF en paralelo reducen el rizado. La constante de tiempo RC asegura un rizado menor a 0.5 V.\\
+
+Regulación: LM7805 proporciona +5 V estables. Se incluye capacitor de entrada (0.33 µF) y salida (1 µF) para estabilidad.\\
+
+Disipación térmica: Para caída de tensión (12 V - 5 V = 7 V) y corriente de 0.5 A, la potencia disipada es 3.5 W. Se requiere disipador de calor adecuado.\\
+
+Protección: Diodo inverso entre salida y entrada del regulador (no mostrado, pero recomendado).\\
+
+\subsection{Criterios de selección de componentes}
+
+Diodos 1N5404
+
+Se seleccionaron debido a su capacidad de soportar corrientes superiores a las requeridas por el sistema y por su adecuado voltaje inverso máximo.\\
+
+Regulador LM7805
+
+Fue elegido por su facilidad de implementación, estabilidad y compatibilidad directa con circuitos TTL de 5 V.\\
+
+Capacitores de filtrado
+
+Los capacitores de 1 mF permiten reducir significativamente el rizado de baja frecuencia, mientras que los capacitores de 0.33 µF y 1 µF ayudan a estabilizar la salida del regulador frente a transitorios.\\
+
+Resistencia de carga
+
+La resistencia de 330 Ω se utilizó para representar una carga equivalente durante la simulación y verificar la regulación de tensión bajo consumo.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Contadores y Display} 
+
+Este módulo tiene la función de generar secuencias temporizadas y visualizar los tiempos de operación mediante displays de siete segmentos. El sistema utiliza un temporizador NE555 configurado como oscilador para generar pulsos de reloj que son enviados a contadores síncronos 74LS192.
+
+La salida de los contadores es decodificada mediante circuitos 74LS47 para controlar displays de siete segmentos de ánodo común.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[c]{0.4\textwidth}
+	\centering
+	\includegraphics[width=2.5in]{fig/contador.PNG}
+	\label{fig:directa}	
+\end{subfigure}
+\hfill
+\caption{Simulacion de circuito; Sistema de temporización y conteo.}
+\label{fig:Amplificador B1}
+\end{figure}
+
+\subsection{Consideraciones de diseño}
+
+Temporización base: El reloj de 1 Hz proviene de un 555 astable con resistencias de 68 kΩ, 4.7 kΩ y capacitor de 10 µF.\\
+
+Conteo regresivo: Los contadores 74LS192 se configuran en modo DOWN. El préstamo (borrow) se conecta al siguiente dígito. La carga en paralelo (LOAD) se activa al inicio de cada fase.\\
+
+Decodificación: El 74LS147 (decodificador BCD a 7 segmentos) requiere resistencias limitadoras de corriente (330 Ω) en cada segmento.\\
+
+Múltiples displays: Para rojo vehicular (30 s), peatonal (20 s) y amarillo (5 s), se multiplexan los contadores o se usan contadores separados.\\
+
+Reset: Al llegar a cero, se genera una señal que notifica a la FSM.
+
+\subsection{Criterios de selección de componentes}
+
+Temporizador NE555
+
+Fue seleccionado debido a su simplicidad, estabilidad y facilidad para generar señales periódicas ajustables mediante resistencias y capacitores externos.\\
+
+Contadores 74LS192
+
+Se eligieron por permitir conteo síncrono ascendente y descendente, además de contar con entradas de carga y reset útiles para el control del sistema.\\
+
+Decodificadores 74LS47
+
+Estos dispositivos permiten convertir señales BCD provenientes de los contadores en señales adecuadas para displays de siete segmentos.\\
+
+Displays de siete segmentos
+
+Se utilizaron para visualizar de manera clara y directa el estado del conteo y los tiempos configurados.\\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Máquina de estados finitos} 
+
+Este módulo implementa la lógica de control principal del sistema mediante una máquina de estados finitos construida con flip-flops y compuertas lógicas TTL. La FSM coordina las transiciones entre distintos estados operativos y controla las señales asociadas a los indicadores luminosos y órdenes de activación.
+
+El circuito utiliza flip-flops 74LS74 para almacenar estados y compuertas lógicas 74LS08, 74LS32 y 74LS04 para implementar la lógica combinacional necesaria.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[c]{0.4\textwidth}
+	\centering
+	\includegraphics[width=2.5in]{fig/fsm.PNG}
+	\label{fig:directa}	
+\end{subfigure}
+\hfill
+\caption{Simulacion de circuito; Maquina de estados.}
+\label{fig:Amplificador B1}
+\end{figure}
+
+\subsection{Consideraciones de diseño}
+
+Estados: Se definen 4 estados principales:
+
+S0: Verde vehicular (espera hasta botón peatonal).
+
+S1: Amarillo vehicular (5 s).
+
+S2: Rojo vehicular + peatonal habilitado (20 s).
+
+S3: Últimos 5 s del peatonal (cambio de frecuencia de audio).
+
+Transiciones: Gobernadas por dos señales:
+
+Botón: solicitud peatonal (solo en S0).
+
+FinTempo: indica que el contador llegó a cero (para S1→S2, S2→S0, S3→S0).
+
+Flip-flops: Se usan dos flip-flops D (74LS74) para codificar 4 estados. La lógica de estado siguiente se implementa con compuertas 74LS32 (OR) y 74LS08 (AND) según sea necesario. \\
+
+Lógica de salida: Las salidas (luces, habilitación de contadores, cambio de frecuencia de audio) son funciones combinacionales del estado actual.
+
+Sincronización: Todas las transiciones ocurren en flanco de bajada del reloj de 1 Hz para evitar condiciones de carrera.
+
+\subsection{Criterios de selección de componentes}
+
+Flip-flops 74LS74
+
+Fueron seleccionados por permitir almacenamiento síncrono de estados y operación estable con señales de reloj.\\
+
+Compuertas lógicas TTL
+
+Las compuertas AND, OR y NOT permiten implementar la lógica combinacional requerida para las transiciones de estado.\\
+
+LEDs indicadores
+
+Se emplearon para visualizar de manera inmediata el estado activo del sistema y facilitar el análisis durante pruebas y simulaciones.\\
+
+Resistencias limitadoras
+
+Las resistencias de 330 Ω fueron utilizadas para limitar la corriente de los LEDs y proteger los dispositivos TTL.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Sistema de antirrebote}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[c]{0.4\textwidth}
+	\centering
+	\includegraphics[width=2.5in]{fig/antirrebote.PNG}
+	\label{fig:directa}	
+\end{subfigure}
+\hfill
+\caption{Simulacion de circuito; Maquina de estados.}
+\label{fig:Amplificador B1}
+\end{figure}
+
+\subsection{Consideraciones de diseño}
+
+\subsection{Criterios de selección de componentes}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Sistema de parlante}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[c]{0.4\textwidth}
+	\centering
+	\includegraphics[width=2.5in]{fig/parlante.PNG}
+	\label{fig:directa}	
+\end{subfigure}
+\hfill
+\caption{Simulacion de circuito; Maquina de estados.}
+\label{fig:Amplificador B1}
+\end{figure}
+
+\subsection{Consideraciones de diseño}
+\subsection{Criterios de selección de componentes}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Conclusiones}
+
+xd
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thebibliography}{1}
+
+\bibitem{Floyd2008}
+T. L. Floyd, \emph{Dispositivos electrónicos}, 8va ed. México: Pearson Educación, 2008.
+
+\bibitem{Boylestad2009}
+R. L. Boylestad y L. Nashelsky, \emph{Electrónica: Teoría de Circuitos y Dispositivos Electrónicos}, 10ma ed. México: Pearson Educación, 2009.
+
+\bibitem{ITCR2026}
+S. Calvo y J. Obando, ``Experimento 8: Respuesta en frecuencia de un amplificador,'' Guía de Laboratorio EL3215, Tecnológico de Costa Rica, I Semestre, 2026.
+
+\end{thebibliography}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{IEEEbiographynophoto}{Sebastián Calvo-Fong}
+Estudiante de ingeniería en electrónica del Tecnológico de Costa Rica. 
+Correo: s.calvo.1@estudiantec.cr
+\end{IEEEbiographynophoto}
+
+\begin{IEEEbiographynophoto}{Juan Esteban Obando-Pérez}
+Estudiante de ingeniería en electrónica del Tecnológico de Costa Rica. 
+Correo: j.obando.1@estudiantec.cr
+\end{IEEEbiographynophoto}
+
+\vfill
+
+\end{document}
+
+
+
+
+
+
